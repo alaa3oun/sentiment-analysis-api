@@ -17,19 +17,20 @@ def predict_sentiment(input_data: TextInput):
     result = sentiment_model(input_data.text)
     return {"label": result[0]['label'], "score": result[0]['score']}
 
-def get_confidence_level(score):
-    if score >= 0.9:
-        return "High"
-    elif score >= 0.7:
-        return "Medium"
-    else:
-        return "Low"
+@app.get("/model-info/")
+def model_info():
+    return {"model": "distilbert-base-uncased-finetuned-sst-2-english"}
 
-@app.post("/predict/")
-def predict_sentiment(input_data: TextInput):
-    result = sentiment_model(input_data.text)
-    confidence = get_confidence_level(result[0]['score'])
-    return {"label": result[0]['label'], "score": result[0]['score'], "confidence": confidence}
+class BatchTextInput(BaseModel):
+    texts: list[str]
+
+@app.post("/predict/batch/")
+def predict_sentiment_batch(batch_data: BatchTextInput):
+    results = sentiment_model(batch_data.texts)
+    return [
+        {"text": text, "label": res["label"], "score": res["score"]}
+        for text, res in zip(batch_data.texts, results)
+    ]
 
 
 #uvicorn app:app --reload
