@@ -53,4 +53,13 @@ def predict_sentiment_batch(batch_data: BatchTextInput):
         for text, res in zip(batch_data.texts, results)
     ]
 
+@app.get("/model-info/")
+def model_info():
+    return {
+        "model": "distilbert-base-uncased-finetuned-sst-2-english",
+        "task": "sentiment-analysis",
+        "description": "Binary sentiment classification (positive/negative)",
+    }
+
+
 #uvicorn app:app --reload
