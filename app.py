@@ -29,6 +29,17 @@ def compare_sentiments(data: TextPair):
         "text1": {"label": results[0]["label"], "score": results[0]["score"]},
         "text2": {"label": results[1]["label"], "score": results[1]["score"]}
     }
+# barch sentiment analysis
+class BatchTextInput(BaseModel):
+    texts: list[str]
+
+@app.post("/predict/batch/")
+def predict_sentiment_batch(batch_data: BatchTextInput):
+    results = sentiment_model(batch_data.texts)
+    return [
+        {"text": text, "label": res["label"], "score": res["score"]}
+        for text, res in zip(batch_data.texts, results)
+    ]
 
 
 #uvicorn app:app --reload
